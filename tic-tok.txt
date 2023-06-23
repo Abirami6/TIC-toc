@@ -1,0 +1,84 @@
+import streamlit as st
+import pandas as pd
+import altair as alt
+
+# Dummy username and password
+username = "admin"
+password = "password"
+
+# Streamlit app header
+st.set_page_config(page_title="Police Dashboard", page_icon=":guardsman:")
+
+# Define a function for the login page
+def login():
+    # Streamlit app title
+    st.title("Login")
+
+    # Create input fields for username and password
+    input_username = st.text_input("Username")
+    input_password = st.text_input("Password", type="password")
+
+    # Create a login button
+    if st.button("Login"):
+        # Check if the username and password match
+        if input_username == username and input_password == password:
+            # Redirect to the police official details page
+            st.experimental_set_query_params(logged_in=True)
+        else:
+            # Display an error message if the login details are incorrect
+            st.error("Incorrect username or password")
+
+# Define a function for the police official details page
+def police_official_details():
+    # Streamlit app title
+    st.title("Police Official Details")
+
+    # Display the details of the dummy police official
+    st.write("Name: John Doe")
+    st.write("Rank: Inspector")
+    st.write("Badge Number: 12345")
+
+    # Dummy personal reports
+    st.header("Personal Reports")
+    report_df = pd.DataFrame({
+        "Date": ["2023-04-01", "2023-04-02", "2023-04-03", "2023-04-04", "2023-04-05"],
+        "Location": ["London", "Paris", "Berlin", "New York", "Tokyo"],
+        "Crime": ["Theft", "Assault", "Robbery", "Burglary", "Vandalism"],
+        "Description": ["A laptop was stolen from a parked car.", "A man was attacked with a baseball bat.", 
+                        "A bank was robbed by armed men.", "A house was broken into and several items were stolen.", 
+                        "A graffiti was found on a public building."]
+    })
+    st.dataframe(report_df)
+
+    # Dummy chart for crime distribution
+    st.header("Crime Distribution")
+    crime_count = report_df.groupby("Crime").size().reset_index(name="Count")
+    chart = alt.Chart(crime_count).mark_bar().encode(
+        x=alt.X("Crime", sort="-y"),
+        y="Count",
+        color="Crime"
+    ).properties(
+        width=700,
+        height=400
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+    # Dummy chart for location distribution
+    st.header("Location Distribution")
+    location_count = report_df.groupby("Location").size().reset_index(name="Count")
+    chart = alt.Chart(location_count).mark_bar().encode(
+        x=alt.X("Location", sort="-y"),
+        y="Count",
+        color="Location"
+    ).properties(
+        width=700,
+        height=400
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+
+# Check if the user is logged in
+if "logged_in" in st.experimental_get_query_params():
+    police_official_details()
+else:
+    login()
